@@ -1,3 +1,5 @@
+const { Schema } = require('mongoose');
+
 /**
  * Pass Object Or Array Or String Or Number and find if it is empty or not, Null Or Undefined also gives false
  * @param  {Any} data data to be checked against
@@ -60,4 +62,25 @@ exports.responseMsg = (errMsg, successStatus, data, paginated) => {
   }
 
   return responseObj;
+};
+
+/**
+ * Returns the validation errors if any are found when validating the data.
+ * @param  {Schema} schema
+ * @param  {Object} data data to be checked against
+ * @return {Object} error which is given if it exists or False
+ */
+exports.validateData = (schema, data, options) => {
+  const validationRes = schema.validate(data, options);
+  if (validationRes.error) {
+    const {
+      error: { details: errors },
+    } = validationRes;
+    const validationErrObj = {};
+    for (let err of errors) {
+      validationErrObj[`${err.context.label} error`] = err.message;
+    }
+    return validationErrObj;
+  }
+  return false;
 };

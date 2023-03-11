@@ -14,21 +14,28 @@ const app = express();
 /* Configuring port */
 app.set('port', process.env.PORT || 8000);
 
+/* Importing database connection */
+require('./src/config/dbConfig');
+
 /* Parsing Request Limits */
-app.use(bodyParser.json({
-  limit: '50mb'
-}));
-app.use(bodyParser.urlencoded({
-  'limit': '50mb',
-  'extended': true
-}));
+app.use(
+  bodyParser.json({
+    limit: '50mb',
+  })
+);
+app.use(
+  bodyParser.urlencoded({
+    limit: '50mb',
+    extended: true,
+  })
+);
 
 /* Configuring Routes */
 app.use('/api', routes);
 
 /* Handling invalid route */
 app.use('/', function (req, res) {
-  res.status(404).send("Route not found");
+  res.status(404).send('Route not found');
 });
 
 /**
@@ -37,4 +44,3 @@ app.use('/', function (req, res) {
 app.listen(app.get('port'), () => {
   console.log(`Find the server at port:${app.get('port')}`);
 });
-
