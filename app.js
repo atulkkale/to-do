@@ -2,6 +2,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const dotenvFlow = require('dotenv-flow');
+const cookieParser = require('cookie-parser');
 
 dotenvFlow.config();
 console.log(' Current Environment ===>', process.env.NODE_ENV);
@@ -18,6 +19,7 @@ app.set('port', process.env.PORT || 8000);
 require('./src/config/dbConfig');
 
 /* Parsing Request Limits */
+app.use(cookieParser());
 app.use(
   bodyParser.json({
     limit: '50mb',
