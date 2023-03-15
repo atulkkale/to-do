@@ -6,7 +6,7 @@ const sgMail = require('@sendgrid/mail');
 const { generateOTP } = require('../services/authServices');
 const jwt = require('jsonwebtoken');
 
-const validationSchema = Joi.object({
+const validationSchema = Joi.object().keys({
   email: Joi.string().email().required(),
   password: Joi.string().min(4).max(18).required(),
 });
