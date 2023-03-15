@@ -86,9 +86,51 @@ exports.updateTask = async (req, res) => {
 
 exports.getTasks = async (req, res) => {
   try {
-    const tasks = await Task.find();
-    console.log(tasks[0]);
-    res.send('get');
+    // Validation
+    const getTaskSchema = Joi.object().keys({
+      page: Joi.number().integer(),
+      limit: Joi.number().integer(),
+    });
+    const validationResult = utils.validateData(
+      getTaskSchema,
+      req.query,
+      taskSchemaOpt
+    );
+    if (validationResult) {
+      return res.status(400).send(utils.responseMsg(validationResult));
+    }
+    const page = parseInt(req.query.page);
+    const limit = parseInt(req.query.limit);
+    if (!(page && limit))
+      return res
+        .status(400)
+        .send(utils.responseMsg('Please provide both page and limit values!'));
+    // Pagination
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+    const tasks = {};
+    tasks.docs = await Task.find({ taskOwner: req.user._id })
+      .limit(limit)
+      .skip(startIndex);
+    tasks.page = page;
+    tasks.limit = limit;
+    tasks.totalDocs = await Task.count({ taskOwner: req.user._id });
+    tasks.totalPages = Math.ceil(tasks.totalDocs / limit);
+    if (endIndex < tasks.totalDocs) {
+      tasks.hasNextPage = true;
+      tasks.nextPage = {
+        page: page + 1,
+        limit: limit,
+      };
+    }
+    if (startIndex > 0) {
+      tasks.hasPrevPage = true;
+      tasks.prevPage = {
+        page: page - 1,
+        limit: limit,
+      };
+    }
+    res.status(200).send(utils.responseMsg(null, true, tasks, true));
   } catch (error) {
     console.log(error);
     res.status(500).send(utils.responseMsg(error.message));
