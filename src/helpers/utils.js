@@ -66,7 +66,7 @@ exports.responseMsg = (errMsg, successStatus, data, paginated) => {
 
 /**
  * Returns the validation errors if any are found when validating the data.
- * @param  {Schema} schema
+ * @param  {Schema} schema validation schema
  * @param  {Object} data data to be checked against
  * @return {Object} error which is given if it exists or False
  */
