@@ -5,11 +5,13 @@ const {
   updateTask,
   getTasks,
   rearrangeTasks,
+  deleteTask,
 } = require('../controllers/taskController');
 
 router.post('/create', cookieJwtAuth, createTask);
-router.patch('/update/:id', updateTask);
-router.get('/list', getTasks);
-router.post('/rearrange', rearrangeTasks);
+router.patch('/update/:id', cookieJwtAuth, updateTask);
+router.get('/list', cookieJwtAuth, getTasks);
+router.post('/rearrange', cookieJwtAuth, rearrangeTasks);
+router.delete('/delete/:id', cookieJwtAuth, deleteTask);
 
 module.exports = router;
