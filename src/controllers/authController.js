@@ -58,7 +58,7 @@ exports.register = async (req, res) => {
       );
   } catch (error) {
     console.log(error);
-    res.status(500).send(utils.responseMsg(error.message));
+    return res.status(500).send(utils.responseMsg(error.message));
   }
 };
 
@@ -112,7 +112,7 @@ exports.login = async (req, res) => {
     }
   } catch (error) {
     console.log(error);
-    res.status(500).send(utils.responseMsg(error.message));
+    return res.status(500).send(utils.responseMsg(error.message));
   }
 };
 
@@ -158,6 +158,6 @@ exports.verify = async (req, res) => {
     }
   } catch (error) {
     console.log(error);
-    res.status(500).send(utils.responseMsg(error.message));
+    return res.status(500).send(utils.responseMsg(error.message));
   }
 };

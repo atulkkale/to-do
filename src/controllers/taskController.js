@@ -31,12 +31,12 @@ exports.createTask = async (req, res) => {
       order: ++taskList.length,
       taskOwner: req.user._id,
     });
-    res
+    return res
       .status(200)
       .send(utils.responseMsg(null, true, 'Task successfully created.'));
   } catch (error) {
     console.log(error);
-    res.status(500).send(utils.responseMsg(error.message));
+    return res.status(500).send(utils.responseMsg(error.message));
   }
 };
 
@@ -75,12 +75,12 @@ exports.updateTask = async (req, res) => {
     );
     if (!task.matchedCount)
       return res.status(404).send(utils.responseMsg('Task not found!'));
-    res
+    return res
       .status(200)
       .send(utils.responseMsg(null, true, 'Task successfully updated.'));
   } catch (error) {
     console.log(error);
-    res.status(500).send(utils.responseMsg(error.message));
+    return res.status(500).send(utils.responseMsg(error.message));
   }
 };
 
@@ -99,13 +99,11 @@ exports.getTasks = async (req, res) => {
     if (validationResult) {
       return res.status(400).send(utils.responseMsg(validationResult));
     }
+    // Pagination
+    let pagination = false;
     const page = parseInt(req.query.page);
     const limit = parseInt(req.query.limit);
-    if (!(page && limit))
-      return res
-        .status(400)
-        .send(utils.responseMsg('Please provide both page and limit values!'));
-    // Pagination
+    if (page && limit) pagination = true;
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
     const tasks = {};
@@ -130,10 +128,12 @@ exports.getTasks = async (req, res) => {
         limit: limit,
       };
     }
-    res.status(200).send(utils.responseMsg(null, true, tasks, true));
+    return res
+      .status(200)
+      .send(utils.responseMsg(null, true, tasks, pagination));
   } catch (error) {
     console.log(error);
-    res.status(500).send(utils.responseMsg(error.message));
+    return res.status(500).send(utils.responseMsg(error.message));
   }
 };
 
@@ -142,5 +142,31 @@ exports.rearrangeTasks = async (req, res) => {
 };
 
 exports.deleteTask = async (req, res) => {
-  res.send('deleteTask');
+  try {
+    const { id } = req.params;
+    // Validation
+    const isValidId = mongoose.Types.ObjectId.isValid(id);
+    if (!isValidId)
+      return res.status(400).send(utils.responseMsg('Invalid Request Id!'));
+    // Delete the task
+    // const isDeleted = await Task.deleteOne({
+    //   _id: id,
+    //   taskOwner: req.user._id,
+    // });
+    // if (!isDeleted.deletedCount)
+    //   return res.status(404).send(utils.responseMsg('Task not found!'));
+    // return res
+    //   .status(200)
+    //   .send(utils.responseMsg(null, true, 'Task successfully deleted.'));
+    // Update the order
+    console.log(id, req.user._id);
+    const result = await Task.find({
+      _id: id,
+      taskOwner: req.user._id,
+    });
+    res.send(result);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send(utils.responseMsg(error.message));
+  }
 };
