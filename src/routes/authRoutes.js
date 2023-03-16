@@ -26,7 +26,7 @@ const { register, login, verify } = require('../controllers/authController');
  * @swagger
  * components:
  *  schemas:
- *    Result:
+ *    ResultSuccess:
  *      type: object
  *      required:
  *        - success
@@ -44,6 +44,38 @@ const { register, login, verify } = require('../controllers/authController');
  *          type: string
  *          nullable: true
  *          description: The response data of the request
+ *      example:
+ *        success: true
+ *        error: null
+ *        data: Operation Successful
+ */
+
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *    ResultFail:
+ *      type: object
+ *      required:
+ *        - success
+ *        - error
+ *        - data
+ *      properties:
+ *        success:
+ *          type: boolean
+ *          description: The status of the request
+ *        error:
+ *          type: string
+ *          nullable: true
+ *          description: The error message of the request
+ *        data:
+ *          type: string
+ *          nullable: true
+ *          description: The response data of the request
+ *      example:
+ *        success: false
+ *        error: Error message
+ *        data: null
  */
 
 /**
@@ -81,41 +113,25 @@ const { register, login, verify } = require('../controllers/authController');
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/Result'
- *            example:
- *              success: true
- *              error: null
- *              data: Register Successful
+ *              $ref: '#/components/schemas/ResultSuccess'
  *      403:
  *        description: Validation Error
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/Result'
- *            example:
- *              success: false
- *              error: Error massage
- *              data: null
+ *              $ref: '#/components/schemas/ResultFail'
  *      409:
  *        description: User already exists!
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/Result'
- *            example:
- *              success: false
- *              error: Error massage
- *              data: null
+ *              $ref: '#/components/schemas/ResultFail'
  *      500:
  *        description: Server Error
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/Result'
- *            example:
- *              success: false
- *              error: Error massage
- *              data: null
+ *              $ref: '#/components/schemas/ResultFail'
  */
 
 router.post('/register', register);
@@ -144,41 +160,25 @@ router.post('/register', register);
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/Result'
- *            example:
- *              success: true
- *              error: null
- *              data: Login Successful
+ *              $ref: '#/components/schemas/ResultSuccess'
  *      403:
  *        description: Validation Error
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/Result'
- *            example:
- *              success: false
- *              error: Error massage
- *              data: null
+ *              $ref: '#/components/schemas/ResultFail'
  *      409:
  *        description: User already exists!
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/Result'
- *            example:
- *              success: false
- *              error: Error massage
- *              data: null
+ *              $ref: '#/components/schemas/ResultFail'
  *      500:
  *        description: Server Error
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/Result'
- *            example:
- *              success: false
- *              error: Error massage
- *              data: null
+ *              $ref: '#/components/schemas/ResultFail'
  */
 
 router.post('/login', login);
@@ -199,8 +199,11 @@ router.post('/login', login);
  *            properties:
  *              email:
  *                type: string
+ *                format: email
+ *                description: Email of the user
  *              otp:
  *                type: integer
+ *                description: OTP of the user
  *            example:
  *              email: kaleatul9@gmail.com
  *              otp: 123456
@@ -212,7 +215,7 @@ router.post('/login', login);
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/Result'
+ *              $ref: '#/components/schemas/ResultSuccess'
  *            example:
  *              success: true
  *              error: null
@@ -222,41 +225,25 @@ router.post('/login', login);
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/Result'
- *            example:
- *              success: false
- *              error: Error massage
- *              data: null
+ *              $ref: '#/components/schemas/ResultFail'
  *      403:
  *        description: Validation Error
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/Result'
- *            example:
- *              success: false
- *              error: Error massage
- *              data: null
+ *              $ref: '#/components/schemas/ResultFail'
  *      404:
  *        description: User not found
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/Result'
- *            example:
- *              success: false
- *              error: Error massage
- *              data: null
+ *              $ref: '#/components/schemas/ResultFail'
  *      500:
  *        description: Server Error
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/Result'
- *            example:
- *              success: false
- *              error: Error massage
- *              data: null
+ *              $ref: '#/components/schemas/ResultFail'
  */
 
 router.post('/verify', verify);

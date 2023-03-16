@@ -24,7 +24,7 @@ exports.createTask = async (req, res) => {
     // Check if task already exists
     const taskList = await Task.find({ taskOwner: req.user._id });
     if (taskList.some((e) => e.taskName === req.body.taskName.toLowerCase()))
-      return res.status(403).send(utils.responseMsg('Task already exists!'));
+      return res.status(409).send(utils.responseMsg('Task already exists!'));
     // Add task
     await Task.create({
       ...req.body,
