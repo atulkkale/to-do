@@ -4,9 +4,7 @@
   "description": "This is a To-Do app that allows users to create and manage their tasks.",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
-    "build": "node app.js",
-    "prod": "node app.js"
+    "start": "node app.js"
   },
   "repository": {
     "type": "git",
