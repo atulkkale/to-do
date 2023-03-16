@@ -149,22 +149,27 @@ exports.deleteTask = async (req, res) => {
     if (!isValidId)
       return res.status(400).send(utils.responseMsg('Invalid Request Id!'));
     // Delete the task
-    // const isDeleted = await Task.deleteOne({
-    //   _id: id,
-    //   taskOwner: req.user._id,
-    // });
-    // if (!isDeleted.deletedCount)
-    //   return res.status(404).send(utils.responseMsg('Task not found!'));
-    // return res
-    //   .status(200)
-    //   .send(utils.responseMsg(null, true, 'Task successfully deleted.'));
-    // Update the order
-    console.log(id, req.user._id);
-    const result = await Task.find({
+    const deletedTask = await Task.findOneAndDelete({
       _id: id,
       taskOwner: req.user._id,
     });
-    res.send(result);
+    if (!deletedTask)
+      return res.status(404).send(utils.responseMsg('Task not found!'));
+    // Update the order
+    await Task.updateMany(
+      {
+        taskOwner: req.user._id,
+        order: { $gt: deletedTask.order },
+      },
+      {
+        $inc: {
+          order: -1,
+        },
+      }
+    );
+    return res
+      .status(200)
+      .send(utils.responseMsg(null, true, 'Task successfully deleted.'));
   } catch (error) {
     console.log(error);
     return res.status(500).send(utils.responseMsg(error.message));
