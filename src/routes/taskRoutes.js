@@ -11,7 +11,7 @@ const {
 router.post('/create', cookieJwtAuth, createTask);
 router.patch('/update/:id', cookieJwtAuth, updateTask);
 router.get('/list', cookieJwtAuth, getTasks);
-router.post('/rearrange', cookieJwtAuth, rearrangeTasks);
+router.patch('/rearrange', cookieJwtAuth, rearrangeTasks);
 router.delete('/delete/:id', cookieJwtAuth, deleteTask);
 
 module.exports = router;

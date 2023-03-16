@@ -24,7 +24,7 @@ exports.register = async (req, res) => {
       validationSchemaOpt
     );
     if (validationResult) {
-      return res.status(400).send(utils.responseMsg(validationResult));
+      return res.status(403).send(utils.responseMsg(validationResult));
     }
     // Checking if user already exists
     const { email } = req.body;
@@ -73,7 +73,7 @@ exports.login = async (req, res) => {
       validationSchemaOpt
     );
     if (validationResult) {
-      return res.status(400).send(utils.responseMsg(validationResult));
+      return res.status(403).send(utils.responseMsg(validationResult));
     }
     // Log in
     const { email, password } = req.body;
@@ -132,7 +132,7 @@ exports.verify = async (req, res) => {
       verifySchemaOpt
     );
     if (validationResult) {
-      return res.status(400).send(utils.responseMsg(validationResult));
+      return res.status(403).send(utils.responseMsg(validationResult));
     }
     // Verify OTP
     const { email, otp } = req.body;

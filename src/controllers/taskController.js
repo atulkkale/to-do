@@ -19,7 +19,7 @@ exports.createTask = async (req, res) => {
       taskSchemaOpt
     );
     if (validationResult) {
-      return res.status(400).send(utils.responseMsg(validationResult));
+      return res.status(403).send(utils.responseMsg(validationResult));
     }
     // Check if task already exists
     const taskList = await Task.find({ taskOwner: req.user._id });
@@ -57,14 +57,14 @@ exports.updateTask = async (req, res) => {
       .required();
     const isValidId = mongoose.Types.ObjectId.isValid(id);
     if (!isValidId)
-      return res.status(400).send(utils.responseMsg('Invalid Request Id!'));
+      return res.status(403).send(utils.responseMsg('Invalid Request Id!'));
     const validationResult = utils.validateData(
       updateTaskSchema,
       req.body,
       taskSchemaOpt
     );
     if (validationResult)
-      return res.status(400).send(utils.responseMsg(validationResult));
+      return res.status(403).send(utils.responseMsg(validationResult));
     // Updating task
     const task = await Task.updateOne(
       { _id: id, taskOwner: req.user._id },
@@ -97,9 +97,10 @@ exports.getTasks = async (req, res) => {
       taskSchemaOpt
     );
     if (validationResult) {
-      return res.status(400).send(utils.responseMsg(validationResult));
+      return res.status(403).send(utils.responseMsg(validationResult));
     }
     // Pagination
+    const userID = req.user._id;
     let pagination = false;
     const page = parseInt(req.query.page);
     const limit = parseInt(req.query.limit);
@@ -107,12 +108,13 @@ exports.getTasks = async (req, res) => {
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
     const tasks = {};
-    tasks.docs = await Task.find({ taskOwner: req.user._id })
-      .limit(limit)
-      .skip(startIndex);
+    tasks.docs = await Task.find({ taskOwner: userID })
+      .sort({ order: 1 })
+      .skip(startIndex)
+      .limit(limit);
     tasks.page = page;
     tasks.limit = limit;
-    tasks.totalDocs = await Task.count({ taskOwner: req.user._id });
+    tasks.totalDocs = await Task.count({ taskOwner: userID });
     tasks.totalPages = Math.ceil(tasks.totalDocs / limit);
     if (endIndex < tasks.totalDocs) {
       tasks.hasNextPage = true;
@@ -138,7 +140,47 @@ exports.getTasks = async (req, res) => {
 };
 
 exports.rearrangeTasks = async (req, res) => {
-  res.send('rearrange');
+  try {
+    // Validation
+    const rearrangeTasksSchema = Joi.array().items(Joi.string().required());
+    const validationResult = utils.validateData(
+      rearrangeTasksSchema,
+      req.body,
+      taskSchemaOpt
+    );
+    if (validationResult) {
+      return res.status(403).send(utils.responseMsg(validationResult));
+    }
+    const userId = req.user.id;
+    const userUpdatedTasks = await Task.find({
+      taskOwner: userId,
+      taskName: { $in: req.body },
+    });
+    const tasksCount = await Task.count({ taskOwner: userId });
+    if (userUpdatedTasks.length !== tasksCount)
+      return res
+        .status(403)
+        .send(utils.responseMsg('Please enter all tasks to rearrange!'));
+    // Rearranging tasks
+    const taskBulkOp = [];
+    for (let task of userUpdatedTasks) {
+      const taskIndex = req.body.indexOf(task.taskName) + 1;
+      const taskUpdateOp = {
+        updateOne: {
+          filter: { _id: task._id },
+          update: { $set: { order: taskIndex } },
+        },
+      };
+      taskBulkOp.push(taskUpdateOp);
+    }
+    await Task.bulkWrite(taskBulkOp);
+    return res
+      .status(200)
+      .send(utils.responseMsg(null, true, 'Task rearranged successfully.'));
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send(utils.responseMsg(error.message));
+  }
 };
 
 exports.deleteTask = async (req, res) => {
@@ -147,18 +189,19 @@ exports.deleteTask = async (req, res) => {
     // Validation
     const isValidId = mongoose.Types.ObjectId.isValid(id);
     if (!isValidId)
-      return res.status(400).send(utils.responseMsg('Invalid Request Id!'));
+      return res.status(403).send(utils.responseMsg('Invalid Request Id!'));
     // Delete the task
+    const { userId } = req.user._id;
     const deletedTask = await Task.findOneAndDelete({
       _id: id,
-      taskOwner: req.user._id,
+      taskOwner: userId,
     });
     if (!deletedTask)
       return res.status(404).send(utils.responseMsg('Task not found!'));
     // Update the order
     await Task.updateMany(
       {
-        taskOwner: req.user._id,
+        taskOwner: userId,
         order: { $gt: deletedTask.order },
       },
       {
