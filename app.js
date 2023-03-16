@@ -3,11 +3,13 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const dotenvFlow = require('dotenv-flow');
 const cookieParser = require('cookie-parser');
+const swaggerUi = require('swagger-ui-express');
 
 dotenvFlow.config();
 console.log(' Current Environment ===>', process.env.NODE_ENV);
 
 //Local Modules
+const swaggerDocument = require('./swagger.json');
 const routes = require('./src/routes/routes');
 
 const app = express();
@@ -34,6 +36,9 @@ app.use(
 
 /* Configuring Routes */
 app.use('/api', routes);
+
+/* Swagger api-docs Routes */
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 /* Handling invalid route */
 app.use('/', function (req, res) {

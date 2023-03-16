@@ -1,0 +1,83 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "To-Do App Documentation",
+    "description": "This is a To-Do API application made with Express and MonodoDB where user can create and manage their tasks.",
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "host": "localhost:3000",
+  "basePath": "/",
+  "tags": [
+    {
+      "name": "Users",
+      "description": "API for users in the system"
+    }
+  ],
+  "schemes": ["http"],
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "paths": {
+    "/api/auth/register": {
+      "post": {
+        "tags": ["Users"],
+        "summary": "Register a User",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "A result object.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+											"example": true
+                    },
+                    "error": {
+                      "type": "string",
+											"nullable": true
+                    },
+										"data": {
+											"type": "object"
+										}
+                  }
+                }
+              }
+            }
+          },
+					"403": {
+						"description": "Validation Error"
+					},
+					"409": {
+						"description": "User already exists!"
+					},
+					"500": {
+						"description": "Server Error"
+					}
+        }
+      }
+    }
+  }
+}
