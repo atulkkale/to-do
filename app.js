@@ -5,6 +5,7 @@ const dotenvFlow = require('dotenv-flow');
 const cookieParser = require('cookie-parser');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
+const cors = require('cors');
 
 dotenvFlow.config();
 console.log(' Current Environment ===>', process.env.NODE_ENV);
@@ -24,6 +25,9 @@ const swaggerOptions = {
     },
     servers: [
       {
+        url: 'https://dull-jade-cocoon-belt.cyclic.app/',
+      },
+      {
         url: 'http://localhost:3000/',
       },
     ],
@@ -35,11 +39,24 @@ const swaggerDocs = swaggerJsDoc(swaggerOptions);
 
 const app = express();
 
+const clientUrl = process.env.CLIENT_URL || '*';
+
 /* Configuring port */
 app.set('port', process.env.PORT || 8000);
 
 /* Importing database connection */
 require('./src/config/dbConfig');
+
+/* CORS settings */
+const corsOptions = {
+  origin: clientUrl,
+  optionsSuccessStatus: 200,
+  methods: ['POST', 'GET', 'OPTIONS', 'HEAD', 'PUT', 'DELETE', 'PATCH'],
+  allowedHeaders: '*',
+  preflightContinue: true,
+};
+app.use(cors(corsOptions));
+app.options('*', cors());
 
 /* Parsing Request Limits */
 app.use(cookieParser());

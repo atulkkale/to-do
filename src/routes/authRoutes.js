@@ -83,7 +83,8 @@ const { register, login, verify } = require('../controllers/authController');
  * components:
  *  securitySchemes:
  *    cookieAuth:
- *      type: apiKey
+ *      type: http
+ *      scheme: bearer
  *      in: cookie
  *      name: jwtToken
  */
