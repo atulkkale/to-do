@@ -191,7 +191,7 @@ exports.deleteTask = async (req, res) => {
     if (!isValidId)
       return res.status(403).send(utils.responseMsg('Invalid Request Id!'));
     // Delete the task
-    const { userId } = req.user._id;
+    const { _id: userId } = req.user;
     const deletedTask = await Task.findOneAndDelete({
       _id: id,
       taskOwner: userId,
