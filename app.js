@@ -25,7 +25,7 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: 'https://dull-jade-cocoon-belt.cyclic.app/',
+        url: 'https://to-do-fvq1.onrender.com/',
       },
       {
         url: 'http://localhost:3000/',
